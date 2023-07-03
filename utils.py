@@ -2,7 +2,9 @@
 import speech_recognition as sr
 import cv2
 
+ACTIVE_CAM = 0
 
+# Lista de los personajes disponibles
 PERSONAJES = ["Mario", "Luigi"]
 def speech_recognizer(text):
     rec = sr.Recognizer()
@@ -17,8 +19,6 @@ def speech_recognizer(text):
     return texto
 
 def load_car(pref):
-    print(pref)
-    print(pref['personaje'])
     car = cv2.imread('aruci/'+pref['personaje']+'bg.png', cv2.IMREAD_UNCHANGED)
     car = cv2.resize(car, None, fx=0.3, fy=0.3)
     return car

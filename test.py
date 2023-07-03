@@ -4,8 +4,8 @@ import os
 import random
 import face_recognition as face
 import time
-from utils import speech_recognizer, load_car
-from game_menu import ini_menu, end_menu
+from utils import speech_recognizer, load_car, ACTIVE_CAM
+from game_menu import  end_menu, ini_menu_minima_interaccion
 import json
 import gestion_usuarios as gu
 
@@ -27,8 +27,6 @@ dist = camara.distCoeffs
 DIC = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_5X5_50)
 parametros = cv2.aruco.DetectorParameters()
 
-# Camara sobre la que trabajamos
-CAMARA = 0
 
 # Funcion que crea los puntos de un cubo
 def create_axis(size):
@@ -177,7 +175,7 @@ def init_recognition(reference_image_path, capture_width=640, capture_height=480
     reference_encodings = face.face_encodings(reference_rgb, reference_locations, model='small')
 
     # Configurar la captura de video
-    cap = cv2.VideoCapture(CAMARA)
+    cap = cv2.VideoCapture(ACTIVE_CAM)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, capture_width)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, capture_height)
 
@@ -263,14 +261,11 @@ def compute_center(framerecortado, rvecs, tvecs):
 def init_game():
     
     #Menu de jugadores 
-    player = ini_menu()
-    #player = "1"
+    player = ini_menu_minima_interaccion()
+
     pref = gu.obtener_preferencias(player)
+    # Cargamos la imagen del coche con el que se correrá
     car = load_car(pref)
-    # Se reconocera la cara del jugador   
-    #while not init_recognition('aruci/cara.png'):
-    #    print("No puedes comenzar el juego")
-    #print("Empezando juego")
     
     # Esto es el orden en el que el jugador tendra que enconrar los checkpoints para acabar el juego.
     marker_order = [0]
@@ -279,7 +274,7 @@ def init_game():
     current_marker_index = 0  # Índice del marcador actual
     start_time = 0  # Tiempo de inicio del juego
     
-    cap = cv2.VideoCapture(CAMARA)
+    cap = cv2.VideoCapture(ACTIVE_CAM)
 
     if cap.isOpened():
         hframe = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -370,7 +365,7 @@ def init_game():
                     if len(completed_markers) == len(marker_order):
                         #framerecortado = cv2.resize(victory ,(framerecortado.shape[1],framerecortado.shape[0]))
                         #cv2.putText(framerecortado, f"Marcadores Completados en {elapsed_time} segundos", (10, hframe- 50), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 0, 0), 2)
-                        end_menu('aruci/victory.png', elapsed_time)
+                        end_menu(player, 'aruci/victory.png', elapsed_time)
                         final = True
                     else:        
                         # Tiempo de jugeo actual y checkpoints visitados
