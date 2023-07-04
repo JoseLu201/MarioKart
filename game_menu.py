@@ -194,6 +194,7 @@ def end_menu(player, img, elapsed_time):
     # Actualizo la base de datos de tiempo del jugador
     print("Guardando resultado...")  
     gu.insertar_tiempo(player, elapsed_time)
-    # Cerrar Pygame
+    # Cerrar 
+    print("Resultado guardado con exito")
     pygame.quit()
 

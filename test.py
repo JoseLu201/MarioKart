@@ -4,10 +4,11 @@ import os
 import random
 import face_recognition as face
 import time
-from utils import speech_recognizer, load_car, ACTIVE_CAM
+from utils import speech_recognizer, load_car, ACTIVE_CAM, PERSONAJES, speech_recognizer_thread
 from game_menu import  end_menu, ini_menu_minima_interaccion
 import json
 import gestion_usuarios as gu
+import threading
 
 
 
@@ -265,7 +266,7 @@ def init_game():
 
     pref = gu.obtener_preferencias(player)
     # Cargamos la imagen del coche con el que se correrá
-    car = load_car(pref)
+    car = load_car(pref['personaje'])
     
     # Esto es el orden en el que el jugador tendra que enconrar los checkpoints para acabar el juego.
     marker_order = [0]
@@ -291,15 +292,23 @@ def init_game():
         duracion_info_inicio = 10
         info = False
         dist_to_score = 10
-    
+            
+        
+   
+        result_holder = []
+        stop_flag = threading.Event()
+        voice_thread = threading.Thread(target=speech_recognizer_thread, args=(result_holder,stop_flag))
+        voice_thread.start()
+        
+         
         #while not "start" in speech_recognizer("Hola " + player + " pronuncia start para comenzar "):
         #   print("Pronuncia start para comenzar")
         
         start_time = time.time()  
-        
         while not final:
             #Leemos el frame en formato BGR
             ret, framebgr = cap.read()
+        
             if ret:
                 # Aquí procesamos el frame, quitando la distorision
                 framerectificado = cv2.undistort(framebgr, mtx, dist, None, matrix)
@@ -309,6 +318,8 @@ def init_game():
                 
                 # Donde ira mario
                 x, y = calcular_coordenadas(framerecortado, car)
+                
+        
                 
                 #Esta parte sera para indicarle al jugador el orden en el que tendra que encontrar los checkpoints.
                 # Si pulsa s, skip, empezamos a jugar, sino esperamos a que el tiempo de info acabe.
@@ -358,27 +369,36 @@ def init_game():
                             framerecortado = draw_cube(framerecortado, rvecs, tvecs,(-1.0,0.0,0.0), scale=0.3, angle=angle)
                             
                             angle = (angle + rotation_speed)%360
-                        
+
                     framerecortado = draw_mario(framerecortado, car, x, y)
                     
                     # Si completamos el juego pantalla de victoria y tiempo en completarlo
                     if len(completed_markers) == len(marker_order):
-                        #framerecortado = cv2.resize(victory ,(framerecortado.shape[1],framerecortado.shape[0]))
-                        #cv2.putText(framerecortado, f"Marcadores Completados en {elapsed_time} segundos", (10, hframe- 50), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 0, 0), 2)
                         end_menu(player, 'aruci/victory.png', elapsed_time)
                         final = True
+                        stop_flag.set()
                     else:        
                         # Tiempo de jugeo actual y checkpoints visitados
                         cv2.putText(framerecortado, f"Visitados : {completed_markers}", (10, 40 ), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
                         elapsed_time = int(time.time() - start_time)
                         cv2.putText(framerecortado, f"Time: {elapsed_time} s", (wframe - 150, hframe- 10), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 0, 0), 2)  
 
-                            
+                
                 cv2.imshow("RECORTADO", framerecortado)
+                
+                if result_holder:
+                    texto_reconocido = result_holder.pop(0)
+                    print("Texto reconocido:", texto_reconocido)
+                    if texto_reconocido in PERSONAJES:
+                        car = load_car(texto_reconocido)
+                    
                 if cv2.waitKey(1) == ord(' '):
                     final = True
+                    stop_flag.set()
             else:
                 final = True
+        voice_thread.join()
+        
     else:
         print("No se pudo acceder a la cámara.")
 

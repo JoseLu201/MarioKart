@@ -2,7 +2,7 @@ import json
 import cv2
 import numpy as np
 import face_recognition as face
-from utils import speech_recognizer, PERSONAJES, ACTIVE_CAM
+from utils import speech_recognizer, PERSONAJES
 
 class NumpyArrayEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -10,11 +10,11 @@ class NumpyArrayEncoder(json.JSONEncoder):
             return obj.tolist()
         return json.default(self, obj)
 
-
+# Funcion que enciende la camara y reconoce a una persona y nos devuelve su face_encoding
+# Con el objetivo de guardarlo y asi reconocer a dicho usuario en futuras ocasiones
 def obtener_face_encoding():
-    # Configurar la captura de video
-    cap = cv2.VideoCapture(ACTIVE_CAM)
-
+    
+    cap = cv2.VideoCapture(0)
     while True:
         ret, frame = cap.read()
         if not ret:
@@ -25,13 +25,10 @@ def obtener_face_encoding():
         reference_encodings = face.face_encodings(reference_rgb, reference_locations, model='small')
 
         if len(reference_encodings) > 0:            
-            # Detener la captura de video y cerrar la ventana
             cap.release()
             cv2.destroyAllWindows()
-            
             return reference_encodings
-
-        # Mostrar el frame con las caras detectadas
+        
         cv2.imshow("Video", frame)
         if cv2.waitKey(1) == ord(' '):
             break
@@ -40,7 +37,7 @@ def obtener_face_encoding():
     cv2.destroyAllWindows()
     return None
 
-    
+# Definimos la estrucutura de cada jugador para asi guardarlo en la base de datos
 def estructurar_jugador(nombre, preferencias,history, encoding_cara):
     jugador = {
         "nombre": nombre,
@@ -50,9 +47,8 @@ def estructurar_jugador(nombre, preferencias,history, encoding_cara):
     }
     return jugador  
 
-
+# Funcion que dado un jugador estructurado lo almacena en la base de datos. 
 def guardar_jugador(jugador):
-
     # Cargar los datos existentes del archivo JSON si existe
     try:
         with open("jugadores.json", 'r') as archivo:
@@ -66,15 +62,18 @@ def guardar_jugador(jugador):
     with open("jugadores.json", 'w') as archivo:
         json.dump(datos_jugadores, archivo, indent=4, cls=NumpyArrayEncoder)        
 
-
+# Funcion para registrar usuarios
+# Obtendremos su face_encoding automaticamente
+# Mediante reconocimiento de voz le pediremos su nombre y personaje preferido 
 def registrar_jugador():
     face_enco = obtener_face_encoding()
 
     nombre = speech_recognizer("Dime tu nombre.") 
-    
+    print("Hola ", nombre)
     personaje = None
     while personaje not in PERSONAJES:
-        personaje = speech_recognizer("Que personaje quieres jugar " + str(PERSONAJES))    
+        personaje = speech_recognizer("Que personaje quieres jugar " + str(PERSONAJES)) 
+           
     preferencias = {
         "idioma" : "sp",
         "personaje" : personaje
@@ -100,8 +99,10 @@ def obtener_encodings_jugadores(jugadores):
     return encodings_jugadores
 
 
+# Funcion principal que recorre todas las caras de la base de datos y las compara con la que esta
+# detectando en ese instante para identificar al usuario o registrarlo en caso de k no lo conozca.
 def reconocer_caras():
-    cap = cv2.VideoCapture(ACTIVE_CAM)
+    cap = cv2.VideoCapture(0)
 
     # Cargar los jugadores y sus encodings
     jugadores = cargar_jugadores()
@@ -194,4 +195,4 @@ def obtener_caracteristicas_jugador(nombre_buscar):
     for jugador in jugadores:
         if jugador["nombre"] == nombre_buscar:
             return jugador
-    return None  # Si el jugador no se encuentra, devuelve None
+    return None 
