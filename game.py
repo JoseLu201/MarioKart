@@ -293,13 +293,10 @@ def init_game():
         info = False
         dist_to_score = 10
             
-        
-   
         result_holder = []
         stop_flag = threading.Event()
         voice_thread = threading.Thread(target=speech_recognizer_thread, args=(result_holder,stop_flag))
         voice_thread.start()
-        
          
         #while not "start" in speech_recognizer("Hola " + player + " pronuncia start para comenzar "):
         #   print("Pronuncia start para comenzar")
@@ -319,8 +316,6 @@ def init_game():
                 # Donde ira mario
                 x, y = calcular_coordenadas(framerecortado, car)
                 
-        
-                
                 #Esta parte sera para indicarle al jugador el orden en el que tendra que encontrar los checkpoints.
                 # Si pulsa s, skip, empezamos a jugar, sino esperamos a que el tiempo de info acabe.
                 tiempo_actual = int(time.time() - start_time)
@@ -334,11 +329,11 @@ def init_game():
                     info = True 
                     #Detectamos los marcadores del frame recortado            
                     (corners, ids, rejected) = cv2.aruco.detectMarkers(framerecortado, DIC, parameters=parametros)
-                    alpha = 0.2  # Factor de atenuación del brillo
-                    framerecortado = cv2.convertScaleAbs(framerecortado, alpha=alpha, beta=0)
-                
-                    
-                    if len(corners)>0:
+                                        
+                    if len(corners) > 0:
+                        
+                        alpha = 0.2  # Factor de atenuación del brillo
+                        framerecortado = cv2.convertScaleAbs(framerecortado, alpha=alpha, beta=0)
                         
                         for i in range(len(ids)):
                                 

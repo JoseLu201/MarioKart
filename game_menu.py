@@ -17,10 +17,11 @@ pygame.display.set_caption("Menú de Jugadores")
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GRAY = (200, 200, 200)
-added = 3
+added = 4
 
 # Fuente del texto
 font = pygame.font.Font(None, 36)
+
 
 def draw_text(text, x, y):
     text_surface = font.render(text, True, BLACK)
@@ -28,7 +29,7 @@ def draw_text(text, x, y):
     window.blit(text_surface, text_rect)
 
 # def ini_menu():
-    
+
 #     menu_phrases = [
 #         "¿Eres un jugador nuevo (Di NEW PLAYER)?",
 #         "¿O eres un jugador existente (Di cualquier cosa diferente)?"
@@ -83,8 +84,7 @@ def draw_text(text, x, y):
 # Esta menu reconocera al jugador, le dara su informacion y rapidamente comenzará el juego
 def ini_menu_minima_interaccion():
     menu_phrases = [
-        "Bienvenido a Mario Kart",
-        "Espacio para comenzar"
+        "Bienvenido a Mario Kart"
     ]
 
     # Calcular el alto total de los rectángulos del menú
@@ -105,32 +105,35 @@ def ini_menu_minima_interaccion():
 
         # Dibujar los rectángulos y el texto del menú
         for phrase in menu_phrases:
-            pygame.draw.rect(window, GRAY, pygame.Rect(rect_x, rect_y, rect_width, rect_height))
+            pygame.draw.rect(window, GRAY, pygame.Rect(
+                rect_x, rect_y, rect_width, rect_height))
             draw_text(phrase, rect_x + 10, rect_y + 5)
             rect_y += rect_height + 10
         pygame.display.flip()
-        
+
         if not jugador_detectado:
             user = gu.reconocer_caras()
             if user is None:
                 print("¡Eres un jugador nuevo!")
                 running = False
                 user = gu.registrar_jugador()
-                
+
             else:
                 print("¡Eres un jugador existente!")
                 print("Hola " + user)
                 print("Mostrando datos...")
                 carac = gu.obtener_caracteristicas_jugador(user)
-                menu_phrases.append( "Jugador: " + str(carac['nombre']))
-                menu_phrases.append( "Personaje: " + str(carac['preferencias']['personaje']))
-                menu_phrases.append( "Historial de tiempos: " + str(gu.obtener_historial(user)))
+                menu_phrases.append("Jugador: " + str(carac['nombre']))
+                menu_phrases.append(
+                    "Personaje: " + str(carac['preferencias']['personaje']))
+                menu_phrases.append(
+                    "Historial de tiempos: " + str(gu.obtener_historial(user)))
                 pygame.display.flip()
             jugador_detectado = True
-            
-        
+            menu_phrases.append("Espacio para comenzar")
+
         # Actualizar la pantalla
-        
+
         pygame.display.flip()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -139,13 +142,13 @@ def ini_menu_minima_interaccion():
                 if event.key == pygame.K_SPACE:
                     running = False
 
-
     # Cerrar Pygame
     pygame.quit()
     return user
 
+
 def end_menu(player, img, elapsed_time):
-        # Inicializar Pygame
+    # Inicializar Pygame
     pygame.init()
 
     # Configuración de la ventana
@@ -156,7 +159,8 @@ def end_menu(player, img, elapsed_time):
 
     # Cargar la imagen de fondo
     background_image = pygame.image.load(img)
-    background_image = pygame.transform.scale(background_image, (window_width, window_height))
+    background_image = pygame.transform.scale(
+        background_image, (window_width, window_height))
 
     # Colores
     WHITE = (255, 255, 255)
@@ -185,16 +189,16 @@ def end_menu(player, img, elapsed_time):
 
         # Dibujar el texto del temporizador
         text = font.render(f"Tiempo: {int(seconds)} segundos", True, BLACK)
-        text_rect = text.get_rect(center=(window_width // 2, window_height - 30))
+        text_rect = text.get_rect(
+            center=(window_width // 2, window_height - 30))
         window.blit(text, text_rect)
-    
+
         # Actualizar la pantalla
         pygame.display.flip()
-     
+
     # Actualizo la base de datos de tiempo del jugador
-    print("Guardando resultado...")  
+    print("Guardando resultado...")
     gu.insertar_tiempo(player, elapsed_time)
-    # Cerrar 
+    # Cerrar
     print("Resultado guardado con exito")
     pygame.quit()
-

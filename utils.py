@@ -7,46 +7,48 @@ ACTIVE_CAM = 0
 
 # Lista de los personajes disponibles
 PERSONAJES = ["Mario", "Luigi"]
+
+
 def speech_recognizer(text):
     rec = sr.Recognizer()
     mic = sr.Microphone()
     print(text)
     with mic as source:
         rec.adjust_for_ambient_noise(source, duration=0.5)
-        audio = rec.listen(source) 
+        audio = rec.listen(source)
     texto = None
     texto = rec.recognize_google(audio)
 
     return texto
 
+
 def speech_recognizer_thread(result_holder, stop_flag):
     rec = sr.Recognizer()
     mic = sr.Microphone()
-    
+
     with mic as source:
-        rec.adjust_for_ambient_noise(source, duration=0.5)  # Ajuste de ruido una sola vez
+        rec.adjust_for_ambient_noise(source, duration=0.5)
         print("Ajuste de ruido completado")
-    
+
     while not stop_flag.is_set():
         with mic as source:
-            audio = rec.listen(source, timeout=3)  # Escucha de audio con un tiempo de espera
-        
+            audio = rec.listen(source, timeout=3)
+
         try:
             texto = rec.recognize_google(audio)
-            result_holder.append(texto)  # Agregar el texto reconocido a la lista de resultados
+            result_holder.append(texto)
         except sr.UnknownValueError:
-            pass  # No se detectó ningún audio reconocible
-        except sr.RequestError as e:
-            print("Error al llamar a Google Speech Recognition service:", e)
+            pass
+
 
 def load_car(pref):
     car = cv2.imread('aruci/'+pref+'bg.png', cv2.IMREAD_UNCHANGED)
     car = cv2.resize(car, None, fx=0.3, fy=0.3)
     return car
 
-#from PIL import Image
+# from PIL import Image
 #
-#def redimensionar_imagen(img1, img2):
+# def redimensionar_imagen(img1, img2):
 #    with Image.open(img1) as imagen1:
 #        width1, height1 = imagen1.size
 #
@@ -55,4 +57,3 @@ def load_car(pref):
 #
 #    # Guardar la imagen redimensionada en un archivo
 #    imagen2_resized.save("imagen2_resized.png")
-    
