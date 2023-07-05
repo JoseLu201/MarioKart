@@ -28,6 +28,7 @@ def draw_text(text, x, y):
     text_rect = text_surface.get_rect(topleft=(x, y))
     window.blit(text_surface, text_rect)
 
+''' 
 # def ini_menu():
 
 #     menu_phrases = [
@@ -79,7 +80,7 @@ def draw_text(text, x, y):
 #     # Cerrar Pygame
 #     pygame.quit()
 #     return user
-
+'''
 
 # Esta menu reconocera al jugador, le dara su informacion y rapidamente comenzará el juego
 def ini_menu_minima_interaccion():
@@ -124,10 +125,8 @@ def ini_menu_minima_interaccion():
                 print("Mostrando datos...")
                 carac = gu.obtener_caracteristicas_jugador(user)
                 menu_phrases.append("Jugador: " + str(carac['nombre']))
-                menu_phrases.append(
-                    "Personaje: " + str(carac['preferencias']['personaje']))
-                menu_phrases.append(
-                    "Historial de tiempos: " + str(gu.obtener_historial(user)))
+                menu_phrases.append("Personaje: " + str(carac['preferencias']['personaje']))
+                menu_phrases.append("Historial de tiempos: " + str(gu.obtener_historial(user)))
                 pygame.display.flip()
             jugador_detectado = True
             menu_phrases.append("Espacio para comenzar")
@@ -161,10 +160,6 @@ def end_menu(player, img, elapsed_time):
     background_image = pygame.image.load(img)
     background_image = pygame.transform.scale(
         background_image, (window_width, window_height))
-
-    # Colores
-    WHITE = (255, 255, 255)
-    BLACK = (0, 0, 0)
 
     # Fuente del texto
     font = pygame.font.Font(None, 48)

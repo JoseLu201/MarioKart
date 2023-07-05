@@ -81,8 +81,7 @@ def registrar_jugador():
     print("Hola ", nombre)
     personaje = None
     while personaje not in PERSONAJES:
-        personaje = speech_recognizer(
-            "Que personaje quieres jugar " + str(PERSONAJES))
+        personaje = speech_recognizer("Que personaje quieres jugar " + str(PERSONAJES))
 
     preferencias = {
         "idioma": "sp",
@@ -201,6 +200,18 @@ def insertar_tiempo(nombre, tiempo):
         json.dump(datos_jugadores, archivo, indent=4, cls=NumpyArrayEncoder)
 
 
+def insertar_coche_preferencia(nombre, car):
+    with open("jugadores.json", 'r') as archivo:
+        datos_jugadores = json.load(archivo)
+
+    for jugador in datos_jugadores:
+        if jugador["nombre"] == nombre:
+            jugador["preferencias"]['personaje'] = car
+            break
+
+    with open("jugadores.json", 'w') as archivo:
+        json.dump(datos_jugadores, archivo, indent=4, cls=NumpyArrayEncoder)
+        
 def obtener_caracteristicas_jugador(nombre_buscar):
     jugadores = cargar_jugadores()
     for jugador in jugadores:

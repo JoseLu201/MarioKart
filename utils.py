@@ -8,6 +8,8 @@ ACTIVE_CAM = 0
 # Lista de los personajes disponibles
 PERSONAJES = ["Mario", "Luigi"]
 
+HABILIDADES = ["Turbo"]
+
 
 def speech_recognizer(text):
     rec = sr.Recognizer()
@@ -39,7 +41,6 @@ def speech_recognizer_thread(result_holder, stop_flag):
             result_holder.append(texto)
         except sr.UnknownValueError:
             pass
-
 
 def load_car(pref):
     car = cv2.imread('aruci/'+pref+'bg.png', cv2.IMREAD_UNCHANGED)

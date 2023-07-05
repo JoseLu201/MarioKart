@@ -4,7 +4,7 @@ import os
 import random
 import face_recognition as face
 import time
-from utils import speech_recognizer, load_car, ACTIVE_CAM, PERSONAJES, speech_recognizer_thread
+from utils import speech_recognizer, load_car, ACTIVE_CAM, PERSONAJES,HABILIDADES, speech_recognizer_thread
 from game_menu import  end_menu, ini_menu_minima_interaccion
 import json
 import gestion_usuarios as gu
@@ -386,6 +386,12 @@ def init_game():
                     print("Texto reconocido:", texto_reconocido)
                     if texto_reconocido in PERSONAJES:
                         car = load_car(texto_reconocido)
+                        gu.insertar_coche_preferencia(player,texto_reconocido)
+                    
+                    if "activate" in texto_reconocido.lower():
+                        if texto_reconocido.split(' ')[1] in HABILIDADES:
+                            print("Activando Habilidad TURBO    ")
+
                     
                 if cv2.waitKey(1) == ord(' '):
                     final = True
